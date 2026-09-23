@@ -1,6 +1,7 @@
-include { MARK_DUPLICATES                    } from './modules/mark_duplicates'
-include { BASE_RECALIBRATOR; APPLY_BQSR      } from './modules/bqsr'
-include { HAPLOTYPE_CALLER                   } from './modules/haplotype_caller'
+include { MARK_DUPLICATES               } from './modules/mark_duplicates'
+include { BASE_RECALIBRATOR; APPLY_BQSR } from './modules/bqsr'
+include { HAPLOTYPE_CALLER              } from './modules/haplotype_caller'
+include { FILTER_VARIANTS               } from './modules/filter_variants'
 
 workflow {
     if (!params.input) {
@@ -38,6 +39,13 @@ workflow {
 
     HAPLOTYPE_CALLER(
         APPLY_BQSR.out.bam,
+        file(params.fasta),
+        file(params.fai),
+        file(params.dict)
+    )
+
+    FILTER_VARIANTS(
+        HAPLOTYPE_CALLER.out.vcf,
         file(params.fasta),
         file(params.fai),
         file(params.dict)
